@@ -51,24 +51,25 @@
   </footer>
 
 <script>
-  const slides = document.getElementById('carousel-slides');
+  const slides = document.getElementById("carousel-slides");
   const totalSlides = slides.children.length;
-  let index = 0;
+  let currentIndex = 0;
 
-  function goToSlide(i) {
-    slides.style.transform = `translateX(-${i * 100}%)`;
+  function updateSlide() {
+    slides.style.transform = `translateX(-${currentIndex * 100}%)`;
   }
 
-  document.getElementById('nextBtn').addEventListener('click', () => {
-    index = (index + 1) % totalSlides;
-    goToSlide(index);
+  document.getElementById("nextBtn").addEventListener("click", () => {
+    currentIndex = (currentIndex + 1) % totalSlides;
+    updateSlide();
   });
 
-  document.getElementById('prevBtn').addEventListener('click', () => {
-    index = (index - 1 + totalSlides) % totalSlides;
-    goToSlide(index);
+  document.getElementById("prevBtn").addEventListener("click", () => {
+    currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+    updateSlide();
   });
 </script>
+
 
 
 
