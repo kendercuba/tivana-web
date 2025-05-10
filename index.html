@@ -13,7 +13,7 @@
   
 <!--CABECERA-->
 <header class="bg-white shadow-md sticky top-0 z-50 px-4 py-3">
-  <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+  <div class="flex flex-col-reverse md:flex-row items-center justify-between w-full gap-4">
 
       <!-- Logo -->
       <div class="flex items-center gap-2">
@@ -29,17 +29,17 @@
       </div>
 
 
-      <!-- Barra de búsqueda -->
-    <div class="flex items-center gap-2 bg-gray-100 rounded overflow-hidden px-2 py-1 w-full sm:max-w-3xl md:max-w-4xl lg:max-w-5xl xl:max-w-6xl">
+          <!-- BARRA DE BÚSQUEDA -->
+    <div class="w-full sm:max-w-3xl md:max-w-4xl lg:max-w-5xl xl:max-w-6xl bg-gray-100 rounded overflow-hidden px-2 py-1 flex items-center gap-2">
       <select class="text-sm bg-transparent outline-none">
         <option>Todos</option>
         <option>Electrónica</option>
         <option>Ropa</option>
         <option>Hogar</option>
       </select>
-      <input type="text" placeholder="Buscar en Tivana..." class="flex-grow bg-transparent outline-none text-sm">
-      <button>
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-600" viewBox="0 0 512 512">
+      <input type="text" placeholder="Buscar en Tivana..." class="flex-grow bg-transparent outline-none text-sm px-2">
+      <button class="bg-orange-500 px-3 py-2 text-white rounded-r">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 fill-white" viewBox="0 0 512 512">
           <path fill="currentColor" d="M416 208c0 45.9-14.9 88.3-40 122.7l126.6 126.7c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0s208 93.1 208 208M208 352a144 144 0 1 0 0-288a144 144 0 1 0 0 288"/>
         </svg>
       </button>
@@ -58,8 +58,8 @@
     </div>
 
 
-    <!-- Sesión y carrito -->
-    <div class="flex items-center gap-4">
+      <!-- SESIÓN Y CARRITO -->
+    <div class="flex items-center justify-end gap-4 w-full md:w-auto">
       <a href="#" class="text-sm hover:underline">Iniciar sesión</a>
       <a href="#" class="text-gray-700 hover:text-black">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 14 14">
