@@ -22,13 +22,22 @@
     });
 </script>
 
+<!-- CARRUSEL RESPONSIVE -->
+<div class="relative overflow-hidden w-full max-w-screen-xl mx-auto mt-6" id="carousel">
+  <div class="flex transition-transform duration-500" id="carousel-slides">
+    <img src="images/Mesa de trabajo 1.png" alt="Imagen 1" class="w-full flex-shrink-0">
+    <img src="images/Mesa de trabajo 2.png" alt="Imagen 2" class="w-full flex-shrink-0">
+  </div>
 
-<main class="container mx-auto py-12 px-4 text-center">
-    <h2 class="text-3xl font-bold mb-4">BIENVENIDO A TIVANA</h2>
-    <p class="text-lg max-w-xl mx-auto">
-      Tu plataforma confiable para comprar en Amazon, Temu y más desde Venezuela.
-    </p>
-  </main>
+  <!-- Botones -->
+  <button id="prevBtn" class="absolute left-2 top-1/2 -translate-y-1/2 bg-white text-black rounded-full p-2 shadow-md z-10">
+    &#10094;
+  </button>
+  <button id="nextBtn" class="absolute right-2 top-1/2 -translate-y-1/2 bg-white text-black rounded-full p-2 shadow-md z-10">
+    &#10095;
+  </button>
+</div>
+
 
   <footer class="bg-gray-200 text-center text-sm text-gray-600 py-4">
     © 2025 Tivana. Todos los derechos reservados.
