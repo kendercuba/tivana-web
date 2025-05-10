@@ -44,5 +44,27 @@
     © 2025 Tivana. Todos los derechos reservados.
   </footer>
 
+  <script>
+  const slides = document.getElementById("carousel-slides");
+  const images = slides.querySelectorAll("img");
+  const totalSlides = images.length;
+  let currentIndex = 0;
+
+  document.getElementById("prevBtn").addEventListener("click", () => {
+    currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+    updateCarousel();
+  });
+
+  document.getElementById("nextBtn").addEventListener("click", () => {
+    currentIndex = (currentIndex + 1) % totalSlides;
+    updateCarousel();
+  });
+
+  function updateCarousel() {
+    slides.style.transform = `translateX(-${currentIndex * 100}%)`;
+  }
+</script>
+
+
 </body>
 </html>
