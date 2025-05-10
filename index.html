@@ -51,14 +51,14 @@
   </footer>
 
 <script>
-  const carousel = document.getElementById('carousel');
+  
   const slides = document.getElementById('carousel-slides');
   const totalSlides = slides.children.length;
   let index = 0;
 
-  const updateSlidePosition = () => {
+  function updateSlidePosition() {
     slides.style.transform = `translateX(-${index * 100}%)`;
-  };
+  }
 
   document.getElementById('prevBtn').addEventListener('click', () => {
     index = (index - 1 + totalSlides) % totalSlides;
@@ -69,8 +69,9 @@
     index = (index + 1) % totalSlides;
     updateSlidePosition();
   });
-  
+
 </script>
+
 
 
 </body>
