@@ -22,84 +22,157 @@
     });
 </script>
 
-<!-- CARRUSEL CON PROPORCIÓN Y ANCHO RESPONSIVO -->
-<div class="relative overflow-hidden mx-auto mt-0 w-[90%] max-w-[1400px] aspect-[3/1]" id="carousel">
-  <div class="flex transition-transform duration-500 h-full w-full" id="carousel-slides">
-    <img src="images/carousel/carrusel1.png" alt="Imagen 1" class="min-w-full h-full object-contain flex-shrink-0">
-    <img src="images/carousel/prueba2.png" alt="Imagen 2" class="min-w-full h-full object-contain flex-shrink-0">
-    <img src="images/carousel/prueba3.png" alt="Imagen 3" class="min-w-full h-full object-contain flex-shrink-0">
-    <img src="images/carousel/prueba4.png" alt="Imagen 4" class="min-w-full h-full object-contain flex-shrink-0">
-    <img src="images/carousel/prueba5.png" alt="Imagen 5" class="min-w-full h-full object-contain flex-shrink-0">
-    <img src="images/carousel/prueba6.png" alt="Imagen 6" class="min-w-full h-full object-contain flex-shrink-0">
-    <img src="images/carousel/prueba7.png" alt="Imagen 7" class="min-w-full h-full object-contain flex-shrink-0">
-    <img src="images/carousel/prueba8.png" alt="Imagen 8" class="min-w-full h-full object-contain flex-shrink-0">
-    
-    <!-- Slide duplicado al final del contenedor -->
-    <img src="images/carousel/carrusel1.png" alt="Imagen 1 (copia)" class="min-w-full h-full object-contain flex-shrink-0">
-  </div>
-
-  <!-- Botones -->
-  <button id="prevBtn" class="absolute left-2 top-1/2 -translate-y-1/2 bg-white text-black rounded-full p-2 shadow-md z-10">
+<!-- CARRUSEL CON LOOP INFINITO -->
+<div class="carousel-container relative overflow-hidden mx-auto mt-0 w-[90%] max-w-[1400px] aspect-[3/1]">
+  <button class="prev absolute left-2 top-1/2 -translate-y-1/2 bg-white text-black rounded-full p-2 shadow-md z-10">
     &#10094;
   </button>
-  <button id="nextBtn" class="absolute right-2 top-1/2 -translate-y-1/2 bg-white text-black rounded-full p-2 shadow-md z-10">
+
+  <div class="carousel-slides flex transition-transform duration-500 h-full w-full">
+    <img src="images/carousel/carrusel1.png" alt="Imagen 1" class="h-full object-contain flex-shrink-0">
+    <img src="images/carousel/prueba2.png" alt="Imagen 2" class="h-full object-contain flex-shrink-0">
+    <img src="images/carousel/prueba3.png" alt="Imagen 3" class="h-full object-contain flex-shrink-0">
+    <img src="images/carousel/prueba4.png" alt="Imagen 4" class="h-full object-contain flex-shrink-0">
+    <img src="images/carousel/prueba5.png" alt="Imagen 5" class="h-full object-contain flex-shrink-0">
+    <img src="images/carousel/prueba6.png" alt="Imagen 6" class="h-full object-contain flex-shrink-0">
+    <img src="images/carousel/prueba7.png" alt="Imagen 7" class="h-full object-contain flex-shrink-0">
+    <img src="images/carousel/prueba8.png" alt="Imagen 8" class="h-full object-contain flex-shrink-0">
+  </div>
+
+  <button class="next absolute right-2 top-1/2 -translate-y-1/2 bg-white text-black rounded-full p-2 shadow-md z-10">
     &#10095;
   </button>
 </div>
-
-
-
-
-  <footer class="bg-gray-200 text-center text-sm text-gray-600 py-4">
-    © 2025 Tivana. Todos los derechos reservados.
-  </footer>
+<div class="carousel-dots text-center mt-2"></div>
 
 <script>
-  const slides = document.getElementById('carousel-slides');
-  const totalSlides = slides.children.length; // incluye duplicado
-  let index = 0;
+// Variables principales
+const slidesContainer = document.querySelector('.carousel-slides');
+const prevButton = document.querySelector('.prev');
+const nextButton = document.querySelector('.next');
+const dotsContainer = document.querySelector('.carousel-dots');
 
-  function goToSlide(i) {
-    slides.style.transition = 'transform 0.5s ease-in-out';
-    slides.style.transform = `translateX(-${i * 100}%)`;
+let slides = Array.from(slidesContainer.children);
+const totalSlides = slides.length;
+
+// Clonar el primer y último slide
+const firstClone = slides[0].cloneNode(true);
+const lastClone = slides[slides.length - 1].cloneNode(true);
+
+firstClone.id = "first-clone";
+lastClone.id = "last-clone";
+
+slidesContainer.appendChild(firstClone);
+slidesContainer.insertBefore(lastClone, slidesContainer.firstChild);
+
+// Reasignar slides con clones incluidos
+slides = Array.from(slidesContainer.children);
+let currentIndex = 1;
+const slideWidth = 100; // %
+
+let slideInterval;
+
+// Estilos dinámicos
+slidesContainer.style.width = `${slides.length * 100}%`;
+slides.forEach(slide => {
+  slide.style.flex = "0 0 100%";
+});
+
+// Posicionar slide inicial
+function updateSlidePosition() {
+  slidesContainer.style.transition = 'transform 0.5s ease';
+  slidesContainer.style.transform = `translateX(-${currentIndex * slideWidth}%)`;
+  updateDots();
+}
+
+// Ajustar puntos
+function updateDots() {
+  const dots = dotsContainer.querySelectorAll('span');
+  dots.forEach(dot => dot.classList.remove('active'));
+  const realIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+  if (dots[realIndex]) dots[realIndex].classList.add('active');
+}
+
+// Detectar fin de transición
+slidesContainer.addEventListener('transitionend', () => {
+  if (slides[currentIndex].id === "first-clone") {
+    slidesContainer.style.transition = 'none';
+    currentIndex = 1;
+    slidesContainer.style.transform = `translateX(-${currentIndex * slideWidth}%)`;
   }
-
-  function resetToStart() {
-    slides.style.transition = 'none';
-    slides.style.transform = `translateX(0%)`;
-    index = 0;
+  if (slides[currentIndex].id === "last-clone") {
+    slidesContainer.style.transition = 'none';
+    currentIndex = totalSlides;
+    slidesContainer.style.transform = `translateX(-${currentIndex * slideWidth}%)`;
   }
+});
 
-  document.getElementById('nextBtn').addEventListener('click', () => {
-    index++;
-    goToSlide(index);
+// Crear dots
+for (let i = 0; i < totalSlides; i++) {
+  const dot = document.createElement('span');
+  dot.style.display = 'inline-block';
+  dot.style.margin = '0 4px';
+  dot.style.width = '10px';
+  dot.style.height = '10px';
+  dot.style.borderRadius = '50%';
+  dot.style.background = '#ccc';
+  dot.style.cursor = 'pointer';
 
-    // Si llega al duplicado (último slide), espera la transición y reinicia visualmente
-    if (index === totalSlides - 1) {
-      setTimeout(resetToStart, 510); // justo después de la animación
-    }
+  dot.addEventListener('click', () => {
+    currentIndex = i + 1;
+    updateSlidePosition();
+    resetAutoplay();
   });
 
-  document.getElementById('prevBtn').addEventListener('click', () => {
-    if (index === 0) {
-      // ir visualmente al duplicado instantáneo
-      slides.style.transition = 'none';
-      index = totalSlides - 1;
-      slides.style.transform = `translateX(-${index * 100}%)`;
+  dotsContainer.appendChild(dot);
+}
 
-      // luego animar hacia el slide anterior
-      setTimeout(() => {
-        index = totalSlides - 2;
-        goToSlide(index);
-      }, 20);
-    } else {
-      index--;
-      goToSlide(index);
-    }
-  });
+// Funciones de navegación
+function showPrevSlide() {
+  if (currentIndex <= 0) return;
+  currentIndex--;
+  updateSlidePosition();
+}
+
+function showNextSlide() {
+  if (currentIndex >= slides.length - 1) return;
+  currentIndex++;
+  updateSlidePosition();
+}
+
+// Eventos
+prevButton.addEventListener('click', () => {
+  showPrevSlide();
+  resetAutoplay();
+});
+
+nextButton.addEventListener('click', () => {
+  showNextSlide();
+  resetAutoplay();
+});
+
+// Auto-play
+function startAutoplay() {
+  slideInterval = setInterval(() => {
+    showNextSlide();
+  }, 5000);
+}
+
+function resetAutoplay() {
+  clearInterval(slideInterval);
+  startAutoplay();
+}
+
+// Inicialización
+updateSlidePosition();
+startAutoplay();
 </script>
 
-
+<style>
+.carousel-dots span.active {
+  background: #000;
+}
+</style>
 
 
 </body>
