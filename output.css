@@ -19,8 +19,8 @@ body { font-family: 'sans-serif'; background-color: #f3f4f6; color: #1f2937; }
 .px-4 { padding-left: 1rem; padding-right: 1rem; }
 .text-lg { font-size: 1.125rem; }
 .max-w-xl { max-width: 36rem; }
-.bg-gray-100 { background-color: #2affed; }
-.bg-gray-200 { background-color: #2affed; }
+.bg-gray-100 { background-color: #f3f4f6; }
+.bg-gray-200 { background-color: #e5e7eb; }
 .text-gray-800 { color: #1f2937; }
 .text-gray-600 { color: #4b5563; }
 
