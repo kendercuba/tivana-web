@@ -50,25 +50,26 @@
     © 2025 Tivana. Todos los derechos reservados.
   </footer>
 
-  <script>
-  const slides = document.getElementById("carousel-slides");
-  const images = slides.querySelectorAll("img");
-  const totalSlides = images.length;
-  let currentIndex = 0;
+<script>
+  const carousel = document.getElementById('carousel');
+  const slides = document.getElementById('carousel-slides');
+  const totalSlides = slides.children.length;
+  let index = 0;
 
-  document.getElementById("prevBtn").addEventListener("click", () => {
-    currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
-    updateCarousel();
+  const updateSlidePosition = () => {
+    slides.style.transform = `translateX(-${index * 100}%)`;
+  };
+
+  document.getElementById('prevBtn').addEventListener('click', () => {
+    index = (index - 1 + totalSlides) % totalSlides;
+    updateSlidePosition();
   });
 
-  document.getElementById("nextBtn").addEventListener("click", () => {
-    currentIndex = (currentIndex + 1) % totalSlides;
-    updateCarousel();
+  document.getElementById('nextBtn').addEventListener('click', () => {
+    index = (index + 1) % totalSlides;
+    updateSlidePosition();
   });
-
-  function updateCarousel() {
-    slides.style.transform = `translateX(-${currentIndex * 100}%)`;
-  }
+  
 </script>
 
 
