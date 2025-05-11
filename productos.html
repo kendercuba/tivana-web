@@ -2,100 +2,58 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Productos - Tivana</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 text-gray-800 font-sans">
 
   <div class="max-w-[1400px] mx-auto px-4 py-6">
-    <h1 class="text-2xl font-bold mb-4">Nuestros Productos</h1>
+    <h1 class="text-2xl font-bold mb-4">Productos disponibles</h1>
 
-    <!-- BARRA DE BÚSQUEDA -->
-    <input type="text" id="searchInput" placeholder="Buscar productos..." 
-      class="w-full p-2 mb-4 border rounded shadow-sm" />
-
-    <!-- BOTONES DE CATEGORÍA -->
-    <div class="flex flex-wrap gap-2 mb-6">
-      <button onclick="filtrarPorCategoria('todos')" class="px-4 py-1 bg-gray-200 rounded hover:bg-gray-300">Todos</button>
-      <button onclick="filtrarPorCategoria('ropa')" class="px-4 py-1 bg-gray-200 rounded hover:bg-gray-300">Ropa</button>
-      <button onclick="filtrarPorCategoria('calzado')" class="px-4 py-1 bg-gray-200 rounded hover:bg-gray-300">Calzado</button>
-      <button onclick="filtrarPorCategoria('accesorios')" class="px-4 py-1 bg-gray-200 rounded hover:bg-gray-300">Accesorios</button>
-      <button onclick="filtrarPorCategoria('belleza')" class="px-4 py-1 bg-gray-200 rounded hover:bg-gray-300">Belleza</button>
+    <div class="flex justify-end mb-4">
+      <a href="checkout.html" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Ver carrito 🛒</a>
     </div>
 
-    <!-- CONTENEDOR DE PRODUCTOS -->
     <div id="productosContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
   </div>
 
   <script>
-    let todosLosProductos = [];
-
-    // Cargar productos desde JSON
     async function cargarProductos() {
-      const res = await fetch('productos.json');
+      const res = await fetch("productos.json");
       const productos = await res.json();
-      todosLosProductos = productos;
-      renderizarProductos(productos);
-      aplicarFiltroDesdeURL();
-    }
+      const contenedor = document.getElementById("productosContainer");
 
-    // Renderizar productos
-    function renderizarProductos(productos) {
-      const contenedor = document.getElementById('productosContainer');
-      contenedor.innerHTML = '';
-
-      if (productos.length === 0) {
-        contenedor.innerHTML = '<p>No se encontraron productos.</p>';
-        return;
-      }
-
-      productos.forEach(prod => {
-        const card = document.createElement('div');
-        card.className = 'bg-white rounded-lg shadow-md overflow-hidden';
+      productos.forEach((prod, index) => {
+        const card = document.createElement("div");
+        card.className = "bg-white rounded-lg shadow-md overflow-hidden";
 
         card.innerHTML = `
           <img src="\${prod.imagen}" alt="\${prod.nombre}" class="w-full h-40 object-contain p-2 bg-gray-50">
           <div class="p-4">
-            <h3 class="text-sm font-semibold">\${prod.nombre}</h3>
-            <p class="text-gray-600 text-sm mb-2">\$ \${prod.precio.toFixed(2)}</p>
-            <button class="bg-yellow-400 hover:bg-yellow-500 text-white text-sm px-3 py-1 rounded">Comprar</button>
+            <h3 class="text-sm font-semibold mb-1">\${prod.nombre}</h3>
+            <p class="text-gray-600 text-sm mb-2">\$ \${prod.precio}</p>
+            <button onclick="agregarAlCarrito(\${index})"
+              class="bg-yellow-400 hover:bg-yellow-500 text-white text-sm px-3 py-1 rounded">Agregar al carrito</button>
           </div>
         `;
-
         contenedor.appendChild(card);
       });
+
+      // Guardar productos globalmente
+      window.productos = productos;
     }
 
-    // Filtro por texto
-    document.getElementById('searchInput').addEventListener('input', e => {
-      const texto = e.target.value.toLowerCase();
-      const filtrados = todosLosProductos.filter(p =>
-        p.nombre.toLowerCase().includes(texto)
-      );
-      renderizarProductos(filtrados);
-    });
-
-    // Filtro por categoría con botones
-    function filtrarPorCategoria(cat) {
-      if (cat === 'todos') {
-        renderizarProductos(todosLosProductos);
-        return;
-      }
-      const filtrados = todosLosProductos.filter(p => p.categoria === cat);
-      renderizarProductos(filtrados);
-    }
-
-    // Leer categoría desde la URL (?categoria=ropa)
-    function aplicarFiltroDesdeURL() {
-      const params = new URLSearchParams(window.location.search);
-      const categoria = params.get('categoria');
-      if (categoria) filtrarPorCategoria(categoria);
+    function agregarAlCarrito(index) {
+      const producto = window.productos[index];
+      let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+      carrito.push(producto);
+      localStorage.setItem("carrito", JSON.stringify(carrito));
+      alert("✅ Producto agregado al carrito");
     }
 
     cargarProductos();
   </script>
-
 </body>
 </html>
