@@ -1,34 +1,53 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Productos Amazon</title>
+  <title>Productos - Tivana</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
 </head>
 <body class="bg-gray-100">
 
-  <h1 class="text-3xl font-bold text-center mt-6 mb-4">Productos de Amazon</h1>
+  <!-- CABECERA SIMPLE -->
+  <header class="bg-white shadow-md sticky top-0 z-50 px-4 py-3">
+    <div class="flex flex-col md:flex-row items-center justify-between w-full gap-4">
+      <div class="flex items-center gap-2">
+        <img src="images/logo.png" alt="Tivana Logo" class="h-8">
+        <span class="text-xl font-bold text-gray-800">Tivana</span>
+      </div>
+      <nav class="flex gap-4 text-sm text-gray-600">
+        <a href="index.html" class="hover:text-blue-600">Inicio</a>
+        <a href="productos.html" class="text-blue-600 font-semibold">Productos</a>
+        <a href="carrito.html" class="hover:text-blue-600">Carrito</a>
+      </nav>
+    </div>
+  </header>
 
+  <!-- TÍTULO -->
+  <h1 class="text-3xl font-bold text-center mt-6 mb-4">Catálogo de Productos</h1>
+
+  <!-- CONTENEDOR -->
   <section id="productos-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-4 mb-10"></section>
 
+  <!-- SCRIPT DE CARGA -->
   <script>
-    fetch('productos_simple.json')
+    fetch('productos_tivana.json')
       .then(res => res.json())
       .then(productos => {
         const contenedor = document.getElementById('productos-container');
         productos.forEach(p => {
-          const productoHTML = `
+          const total = (p.precio + p.envio).toFixed(2);
+          const html = `
             <div class="bg-white rounded shadow p-4 hover:shadow-lg transition">
-              <a href="${p.url}" target="_blank" rel="noopener noreferrer">
-                <img src="${p.image}" alt="${p.title}" class="w-full h-48 object-contain mb-4" />
-                <h3 class="text-md font-semibold mb-2">${p.title}</h3>
-                <p class="text-green-600 font-bold text-lg">$${p.price}</p>
-              </a>
+              <img src="${p.imagen}" alt="${p.titulo}" class="w-full h-48 object-contain mb-4" />
+              <h3 class="text-md font-semibold mb-2">${p.titulo}</h3>
+              <p class="text-sm text-gray-700">Precio: $${p.precio.toFixed(2)}</p>
+              <p class="text-sm text-gray-700">Envío estimado: $${p.envio.toFixed(2)}</p>
+              <p class="text-green-600 font-bold text-lg">Total: $${total}</p>
+              <button class="mt-3 bg-blue-600 text-white px-4 py-2 rounded w-full hover:bg-blue-700">Comprar con Tivana</button>
             </div>
           `;
-          contenedor.innerHTML += productoHTML;
+          contenedor.innerHTML += html;
         });
       })
       .catch(error => {
