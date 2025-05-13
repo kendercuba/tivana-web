@@ -48,57 +48,71 @@
 
 </div>
 
- <!-- Cuadros flotantes encima del carrusel -->
-  <div class="w-[90%] max-w-[1400px] mx-auto relative -top-24 px-4">
-  <div class="flex justify-between gap-2">
-    <!-- Card 1 -->
-    <div class="bg-white rounded-lg shadow-lg p-4 basis-[24%] h-[320px]">
-      <h3 class="text-lg font-semibold mb-2">Ofertas</h3>
-      <div class="grid grid-cols-2 gap-2">
-        <img src="images/productos/medias1.png" class="w-full rounded">
-        <img src="images/productos/medias2.png" class="w-full rounded">
-        <img src="images/productos/medias3.png" class="w-full rounded">
-        <img src="images/productos/medias4.png" class="w-full rounded">
-      </div>
-      <a href="#" class="text-blue-600 text-sm mt-2 inline-block">Ver todas</a>
+<!-- CUADROS FLOTANTES CON PREVIEW DE PRODUCTOS -->
+<div class="w-[90%] max-w-[1400px] mx-auto relative -top-24 px-4">
+  <div class="flex flex-wrap justify-between gap-4">
+
+    <!-- MÁS VENDIDOS -->
+    <div class="bg-white rounded-lg shadow-lg p-4 basis-[24%] min-w-[300px] h-[360px] overflow-hidden">
+      <h3 class="text-lg font-semibold mb-2">Más vendidos</h3>
+      <div id="masvendidos-container" class="grid grid-cols-2 gap-2 h-[230px] overflow-auto"></div>
+      <a href="productos.html?categoria=mas-vendidos" class="text-blue-600 text-sm mt-2 inline-block">Ver todos</a>
     </div>
 
-    <!-- Card 2 -->
-    <div class="bg-white rounded-lg shadow-lg p-4 basis-[320px]">
-      <h3 class="text-lg font-semibold mb-2">Bolsos usados</h3>
-      <div class="grid grid-cols-2 gap-2">
-        <img src="images/productos/lv.png" class="w-full rounded">
-        <img src="images/productos/goyard.png" class="w-full rounded">
-        <img src="images/productos/dior.png" class="w-full rounded">
-        <img src="images/productos/gucci.png" class="w-full rounded">
-      </div>
-      <a href="#" class="text-blue-600 text-sm mt-2 inline-block">Ver más</a>
+    <!-- OFERTAS DEL DÍA -->
+    <div class="bg-white rounded-lg shadow-lg p-4 basis-[24%] min-w-[300px] h-[360px] overflow-hidden">
+      <h3 class="text-lg font-semibold mb-2">Ofertas del día</h3>
+      <div id="ofertas-container" class="grid grid-cols-2 gap-2 h-[230px] overflow-auto"></div>
+      <a href="productos.html?categoria=ofertas" class="text-blue-600 text-sm mt-2 inline-block">Ver todas</a>
     </div>
 
-     <!-- Card 3 -->
-    <div class="bg-white rounded-lg shadow-lg p-4 basis-[320px]">
-      <h3 class="text-lg font-semibold mb-2">Bolsos usados</h3>
-      <div class="grid grid-cols-2 gap-2">
-        <img src="images/productos/lv.png" class="w-full rounded">
-        <img src="images/productos/goyard.png" class="w-full rounded">
-        <img src="images/productos/dior.png" class="w-full rounded">
-        <img src="images/productos/gucci.png" class="w-full rounded">
-      </div>
-      <a href="#" class="text-blue-600 text-sm mt-2 inline-block">Ver más</a>
+    <!-- SEGUIR COMPRANDO -->
+    <div class="bg-white rounded-lg shadow-lg p-4 basis-[24%] min-w-[300px] h-[360px] overflow-hidden">
+      <h3 class="text-lg font-semibold mb-2">Seguir comprando</h3>
+      <div id="seguir-container" class="grid grid-cols-2 gap-2 h-[230px] overflow-auto"></div>
+      <a href="productos.html" class="text-blue-600 text-sm mt-2 inline-block">Ver más</a>
     </div>
 
-     <!-- Card 4 -->
-    <div class="bg-white rounded-lg shadow-lg p-4 basis-[320px]">
-      <h3 class="text-lg font-semibold mb-2">Bolsos usados</h3>
-      <div class="grid grid-cols-2 gap-2">
-        <img src="images/productos/lv.png" class="w-full rounded">
-        <img src="images/productos/goyard.png" class="w-full rounded">
-        <img src="images/productos/dior.png" class="w-full rounded">
-        <img src="images/productos/gucci.png" class="w-full rounded">
-      </div>
-      <a href="#" class="text-blue-600 text-sm mt-2 inline-block">Ver más</a>
+    <!-- TUS PEDIDOS -->
+    <div class="bg-white rounded-lg shadow-lg p-4 basis-[24%] min-w-[300px] h-[360px] overflow-hidden">
+      <h3 class="text-lg font-semibold mb-2">Tus pedidos</h3>
+      <div id="pedidos-container" class="grid grid-cols-2 gap-2 h-[230px] overflow-auto"></div>
+      <a href="#" class="text-blue-600 text-sm mt-2 inline-block">Gestionar pedidos</a>
     </div>
+
   </div>
+</div>
+
+<!-- SCRIPT PARA PREVIEWS -->
+<script>
+  fetch("productos_tivana.json")
+    .then(res => res.json())
+    .then(productos => {
+      // Llenar cada sección con 4 productos distintos
+      const masVendidos = productos.slice(0, 4);
+      const ofertas = productos.filter(p => p.precio < 30).slice(0, 4);
+      const seguirComprando = productos.slice(8, 12);
+      const pedidos = productos.slice(-4); // Últimos productos
+
+      const render = (lista, contenedorId) => {
+        const contenedor = document.getElementById(contenedorId);
+        contenedor.innerHTML = "";
+        lista.forEach(p => {
+          contenedor.innerHTML += `
+            <a href="productos.html?busqueda=${encodeURIComponent(p.titulo)}" class="block hover:scale-105 transition">
+              <img src="${p.imagen}" alt="${p.titulo}" class="w-full h-24 object-contain mb-1 rounded">
+              <p class="text-xs text-gray-700 truncate">$${p.precio}</p>
+            </a>
+          `;
+        });
+      };
+
+      render(masVendidos, "masvendidos-container");
+      render(ofertas, "ofertas-container");
+      render(seguirComprando, "seguir-container");
+      render(pedidos, "pedidos-container");
+    });
+</script>
 
 
   <footer class="bg-gray-200 text-center text-sm text-gray-600 py-4">
