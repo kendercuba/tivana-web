@@ -1,0 +1,14 @@
+[
+  {
+    "id": "101",
+    "titulo": "Camisa casual de lino",
+    "precio": 14.99,
+    "descripcion": "Camisa fresca y ligera, ideal para días calurosos.",
+    "imagenes": [
+      "https://img.ltwebstatic.com/images3_pi/2023/05/01/168292053889e7919ad6a3c07a3622dfda139eb7e0_thumbnail_600x.webp",
+      "https://img.ltwebstatic.com/images3_pi/2023/05/01/1682920548c1d61f3514af5a2cc2f9b1cf1b3ec5e7_thumbnail_600x.webp",
+      "https://img.ltwebstatic.com/images3_pi/2023/05/01/16829205578c5e8f3131a8e3af409e17700e99de3f_thumbnail_600x.webp"
+    ],
+    "enlace": "https://www.shein.com/producto-prueba"
+  }
+]
