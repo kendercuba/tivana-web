@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalle del Producto | Tivana</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+  <div class="max-w-6xl mx-auto p-4">
+    <a href="index.html" class="text-blue-600 underline">Volver al inicio</a>
+    <div id="producto-container" class="mt-6 bg-white rounded shadow p-6 flex flex-col md:flex-row gap-6">
+      <!-- Imágenes -->
+      <div class="w-full md:w-1/2">
+        <div id="imagenes-preview" class="mb-4">
+          <img id="imagen-principal" src="" alt="Imagen principal" class="w-full rounded">
+        </div>
+        <div id="galeria" class="flex gap-2 overflow-x-auto"></div>
+      </div>
+
+      <!-- Detalles -->
+      <div class="w-full md:w-1/2">
+        <h1 id="titulo" class="text-2xl font-bold mb-2"></h1>
+        <p id="precio" class="text-xl text-green-600 mb-2"></p>
+        <p id="descripcion" class="text-gray-700 mb-4"></p>
+        <a id="comprar-enlace" href="#" target="_blank" class="inline-block bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
+          Comprar en Shein
+        </a>
+        <button class="block mt-4 text-sm text-blue-600">Agregar al carrito</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get("id");
+
+    fetch("productos_tivana_detalle.json")
+      .then(res => res.json())
+      .then(productos => {
+        const producto = productos.find(p => p.id == id);
+        if (!producto) return document.body.innerHTML = "<p class='text-center text-red-600'>Producto no encontrado</p>";
+
+        document.getElementById("titulo").textContent = producto.titulo;
+        document.getElementById("precio").textContent = `$${producto.precio}`;
+        document.getElementById("descripcion").textContent = producto.descripcion || "Sin descripción.";
+        document.getElementById("imagen-principal").src = producto.imagenes?.[0] || "";
+        document.getElementById("comprar-enlace").href = producto.enlace;
+
+        const galeria = document.getElementById("galeria");
+        producto.imagenes?.forEach(img => {
+          const mini = document.createElement("img");
+          mini.src = img;
+          mini.className = "w-20 h-20 object-cover cursor-pointer rounded hover:ring-2";
+          mini.onclick = () => document.getElementById("imagen-principal").src = img;
+          galeria.appendChild(mini);
+        });
+      });
+  </script>
+</body>
+</html>
