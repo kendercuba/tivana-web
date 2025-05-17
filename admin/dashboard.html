@@ -10,6 +10,16 @@
 <body class="bg-gray-50 min-h-screen p-6">
   <div class="max-w-7xl mx-auto">
     <h1 class="text-3xl font-bold mb-6">Panel de Productos</h1>
+
+            <!-- FORMULARIO PARA AGREGAR PRODUCTO -->
+        <form id="form-agregar" class="bg-white rounded shadow p-4 mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <input type="text" id="titulo" placeholder="Título del producto" class="border px-3 py-2 rounded w-full">
+        <input type="number" id="precio" placeholder="Precio" step="0.01" class="border px-3 py-2 rounded w-full">
+        <input type="text" id="imagen" placeholder="URL de la imagen" class="border px-3 py-2 rounded w-full">
+        <button type="submit" class="col-span-1 md:col-span-3 bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+            Agregar producto
+        </button>
+        </form>
     <div id="productos-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
   </div>
 
@@ -34,6 +44,35 @@
           contenedor.innerHTML += card;
         });
       });
+
+      // NUEVO: Formulario para agregar producto
+  document.getElementById("form-agregar").addEventListener("submit", e => {
+    e.preventDefault();
+
+    const titulo = document.getElementById("titulo").value.trim();
+    const precio = parseFloat(document.getElementById("precio").value);
+    const imagen = document.getElementById("imagen").value.trim();
+
+    if (!titulo || isNaN(precio) || !imagen) {
+      alert("Por favor completa todos los campos.");
+      return;
+    }
+
+    const nuevo = { titulo, precio, imagen };
+
+    const tarjeta = `
+      <div class="bg-white p-4 rounded shadow">
+        <img src="${imagen}" class="w-full h-40 object-contain mb-2" />
+        <h2 class="font-semibold">${titulo}</h2>
+        <p class="text-sm text-gray-700">$${precio}</p>
+        <button class="mt-2 text-sm bg-red-500 text-white px-3 py-1 rounded">Eliminar</button>
+      </div>
+    `;
+    contenedor.innerHTML += tarjeta;
+
+    document.getElementById("form-agregar").reset();
+  });
+  
   </script>
 </body>
 </html>
