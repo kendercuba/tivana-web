@@ -23,29 +23,40 @@
     <div id="productos-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
   </div>
 
-  <script>
-    if (!localStorage.getItem("loggedIn")) {
-      window.location.href = "index.html";
-    }
+ <script>
+  if (!localStorage.getItem("loggedIn")) {
+    window.location.href = "index.html";
+  }
 
-    fetch("../productos_tivana.json")  // ✅ sube un nivel y lo encuentra en raíz
-      .then(res => res.json())
-      .then(productos => {
-        const contenedor = document.getElementById("productos-container");
-        productos.forEach(p => {
-          const card = `
-            <div class="bg-white p-4 rounded shadow">
-              <img src="${p.imagen}" class="w-full h-40 object-contain mb-2" />
-              <h2 class="font-semibold">${p.titulo}</h2>
-              <p class="text-sm text-gray-700">$${p.precio}</p>
-              <button class="mt-2 text-sm bg-red-500 text-white px-3 py-1 rounded">Eliminar</button>
-            </div>
-          `;
-          contenedor.innerHTML += card;
-        });
-      });
+  const API_URL = "https://tivana-backend.onrender.com/api/productos";
+  const contenedor = document.getElementById("productos-container");
 
-      // NUEVO: Formulario para agregar producto
+  // Función para renderizar productos
+  function renderProductos(productos) {
+    contenedor.innerHTML = "";
+    productos.forEach((p, index) => {
+      const card = `
+        <div class="bg-white p-4 rounded shadow">
+          <img src="${p.imagen}" class="w-full h-40 object-contain mb-2" />
+          <h2 class="font-semibold">${p.titulo}</h2>
+          <p class="text-sm text-gray-700">$${p.precio}</p>
+          <button onclick="eliminarProducto(${index})" class="mt-2 text-sm bg-red-500 text-white px-3 py-1 rounded">Eliminar</button>
+        </div>
+      `;
+      contenedor.innerHTML += card;
+    });
+  }
+
+  // Obtener productos al cargar la página
+  fetch(API_URL)
+    .then(res => res.json())
+    .then(renderProductos)
+    .catch(err => {
+      console.error("❌ Error cargando productos:", err);
+      contenedor.innerHTML = "<p class='text-red-500'>No se pudieron cargar los productos.</p>";
+    });
+
+  // Agregar producto al servidor
   document.getElementById("form-agregar").addEventListener("submit", e => {
     e.preventDefault();
 
@@ -58,21 +69,41 @@
       return;
     }
 
-    const nuevo = { titulo, precio, imagen };
+    const nuevo = {
+      titulo,
+      precio,
+      imagen,
+      enlace: "#" // Puedes agregarlo como campo vacío temporal
+    };
 
-    const tarjeta = `
-      <div class="bg-white p-4 rounded shadow">
-        <img src="${imagen}" class="w-full h-40 object-contain mb-2" />
-        <h2 class="font-semibold">${titulo}</h2>
-        <p class="text-sm text-gray-700">$${precio}</p>
-        <button class="mt-2 text-sm bg-red-500 text-white px-3 py-1 rounded">Eliminar</button>
-      </div>
-    `;
-    contenedor.innerHTML += tarjeta;
-
-    document.getElementById("form-agregar").reset();
+    fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(nuevo)
+    })
+      .then(res => res.json())
+      .then(() => {
+        document.getElementById("form-agregar").reset();
+        return fetch(API_URL);
+      })
+      .then(res => res.json())
+      .then(renderProductos);
   });
-  
-  </script>
+
+  // Eliminar producto
+  function eliminarProducto(index) {
+    if (!confirm("¿Seguro que quieres eliminar este producto?")) return;
+
+    fetch(`${API_URL}/${index}`, {
+      method: "DELETE"
+    })
+      .then(res => res.json())
+      .then(() => fetch(API_URL))
+      .then(res => res.json())
+      .then(renderProductos);
+  }
+</script>
 </body>
 </html>
