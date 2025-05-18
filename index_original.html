@@ -1,0 +1,171 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tivana Pro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+</head>
+
+<body class="bg-gray-100 font-sans text-gray-800">
+  
+<!--CABECERA-->
+<div id="header-container"></div>
+
+<script>
+  fetch('components/header.html')
+    .then(res => res.text())
+    .then(html => {
+      document.getElementById('header-container').innerHTML = html;
+    });
+</script>
+
+<!-- CARRUSEL CON PROPORCIÓN Y ANCHO RESPONSIVO -->
+<div class="relative overflow-hidden mx-auto mt-0 w-[90%] max-w-[1400px] aspect-[3/1]" id="carousel">
+  <div class="flex transition-transform duration-500 h-full w-full" id="carousel-slides">
+    <img src="images/carousel/carrusel1.png" alt="Imagen 1" class="min-w-full h-full object-contain flex-shrink-0">
+    <img src="images/carousel/prueba2.png" alt="Imagen 2" class="min-w-full h-full object-contain flex-shrink-0">
+    <img src="images/carousel/prueba3.png" alt="Imagen 3" class="min-w-full h-full object-contain flex-shrink-0">
+    <img src="images/carousel/prueba4.png" alt="Imagen 4" class="min-w-full h-full object-contain flex-shrink-0">
+    <img src="images/carousel/prueba5.png" alt="Imagen 5" class="min-w-full h-full object-contain flex-shrink-0">
+    <img src="images/carousel/prueba6.png" alt="Imagen 6" class="min-w-full h-full object-contain flex-shrink-0">
+    <img src="images/carousel/prueba7.png" alt="Imagen 7" class="min-w-full h-full object-contain flex-shrink-0">
+    <img src="images/carousel/prueba8.png" alt="Imagen 8" class="min-w-full h-full object-contain flex-shrink-0">
+    
+    <!-- Slide duplicado al final del contenedor -->
+    <img src="images/carousel/carrusel1.png" alt="Imagen 1 (copia)" class="min-w-full h-full object-contain flex-shrink-0">
+  </div>
+
+  <!-- Botones -->
+  <button id="prevBtn" class="absolute left-2 top-1/2 -translate-y-1/2 bg-white text-black rounded-full p-2 shadow-md z-10">
+    &#10094;
+  </button>
+  <button id="nextBtn" class="absolute right-2 top-1/2 -translate-y-1/2 bg-white text-black rounded-full p-2 shadow-md z-10">
+    &#10095;
+  </button>
+
+</div>
+
+<!-- CUADROS FLOTANTES CON PREVIEW DE PRODUCTOS -->
+<div class="w-[90%] max-w-[1400px] mx-auto relative -top-24 px-4">
+  <div class="flex flex-wrap justify-between gap-4">
+
+    <!-- MÁS VENDIDOS -->
+    <div class="bg-white rounded-lg shadow-lg p-4 basis-[24%] min-w-[300px] h-[360px] overflow-hidden">
+      <h3 class="text-lg font-semibold mb-2">Más vendidos</h3>
+      <div id="masvendidos-container" class="grid grid-cols-2 gap-2 h-[230px] overflow-auto"></div>
+      <a href="productos.html?categoria=mas-vendidos" class="text-blue-600 text-sm mt-2 inline-block">Ver todos</a>
+    </div>
+
+    <!-- OFERTAS DEL DÍA -->
+    <div class="bg-white rounded-lg shadow-lg p-4 basis-[24%] min-w-[300px] h-[360px] overflow-hidden">
+      <h3 class="text-lg font-semibold mb-2">Ofertas del día</h3>
+      <div id="ofertas-container" class="grid grid-cols-2 gap-2 h-[230px] overflow-auto"></div>
+      <a href="productos.html?categoria=ofertas" class="text-blue-600 text-sm mt-2 inline-block">Ver todas</a>
+    </div>
+
+    <!-- SEGUIR COMPRANDO -->
+    <div class="bg-white rounded-lg shadow-lg p-4 basis-[24%] min-w-[300px] h-[360px] overflow-hidden">
+      <h3 class="text-lg font-semibold mb-2">Seguir comprando</h3>
+      <div id="seguir-container" class="grid grid-cols-2 gap-2 h-[230px] overflow-auto"></div>
+      <a href="productos.html" class="text-blue-600 text-sm mt-2 inline-block">Ver más</a>
+    </div>
+
+    <!-- TUS PEDIDOS -->
+    <div class="bg-white rounded-lg shadow-lg p-4 basis-[24%] min-w-[300px] h-[360px] overflow-hidden">
+      <h3 class="text-lg font-semibold mb-2">Tus pedidos</h3>
+      <div id="pedidos-container" class="grid grid-cols-2 gap-2 h-[230px] overflow-auto"></div>
+      <a href="#" class="text-blue-600 text-sm mt-2 inline-block">Gestionar pedidos</a>
+    </div>
+
+  </div>
+</div>
+
+<!-- SCRIPT PARA PREVIEWS -->
+<script>
+  fetch("productos_tivana.json")
+    .then(res => res.json())
+    .then(productos => {
+      // Llenar cada sección con 4 productos distintos
+      const masVendidos = productos.slice(0, 4);
+      const ofertas = productos.filter(p => p.precio < 30).slice(0, 4);
+      const seguirComprando = productos.slice(8, 12);
+      const pedidos = productos.slice(-4); // Últimos productos
+
+      const render = (lista, contenedorId) => {
+        const contenedor = document.getElementById(contenedorId);
+        contenedor.innerHTML = "";
+        lista.forEach(p => {
+          contenedor.innerHTML += `
+            <a href="productos.html?busqueda=${encodeURIComponent(p.titulo)}" class="block hover:scale-105 transition">
+              <img src="${p.imagen}" alt="${p.titulo}" class="w-full h-24 object-contain mb-1 rounded">
+              <p class="text-xs text-gray-700 truncate">$${p.precio}</p>
+            </a>
+          `;
+        });
+      };
+
+      render(masVendidos, "masvendidos-container");
+      render(ofertas, "ofertas-container");
+      render(seguirComprando, "seguir-container");
+      render(pedidos, "pedidos-container");
+    });
+</script>
+
+
+  <footer class="bg-gray-200 text-center text-sm text-gray-600 py-4">
+    © 2025 Tivana. Todos los derechos reservados.
+  </footer>
+
+<script>
+  const slides = document.getElementById('carousel-slides');
+  const totalSlides = slides.children.length; // incluye duplicado
+  let index = 0;
+
+  function goToSlide(i) {
+    slides.style.transition = 'transform 0.5s ease-in-out';
+    slides.style.transform = `translateX(-${i * 100}%)`;
+  }
+
+  function resetToStart() {
+    slides.style.transition = 'none';
+    slides.style.transform = `translateX(0%)`;
+    index = 0;
+  }
+
+  document.getElementById('nextBtn').addEventListener('click', () => {
+    index++;
+    goToSlide(index);
+
+    // Si llega al duplicado (último slide), espera la transición y reinicia visualmente
+    if (index === totalSlides - 1) {
+      setTimeout(resetToStart, 510); // justo después de la animación
+    }
+  });
+
+  document.getElementById('prevBtn').addEventListener('click', () => {
+    if (index === 0) {
+      // ir visualmente al duplicado instantáneo
+      slides.style.transition = 'none';
+      index = totalSlides - 1;
+      slides.style.transform = `translateX(-${index * 100}%)`;
+
+      // luego animar hacia el slide anterior
+      setTimeout(() => {
+        index = totalSlides - 2;
+        goToSlide(index);
+      }, 20);
+    } else {
+      index--;
+      goToSlide(index);
+    }
+  });
+</script>
+
+
+
+
+</body>
+</html>
