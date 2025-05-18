@@ -65,20 +65,21 @@
 
     contenedor.innerHTML = `<p class="col-span-full text-center text-gray-500">Cargando productos de ${fuente}...</p>`;
 
-    fetch(rutas[fuente])
-      .then(res => res.json())
-      .then(productos => {
-        productosCargados = productos;
-        const urlParams = new URLSearchParams(window.location.search);
-const valorBusqueda = urlParams.get("busqueda") || document.getElementById("busqueda-input")?.value || "";
-if (document.getElementById("busqueda-input")) {
-  document.getElementById("busqueda-input").value = valorBusqueda;
-}
-filtrarProductos(valorBusqueda);
+ fetch(rutas[fuente])
+  .then(res => res.json())
+  .then(productos => {
+    productosCargados = productos;
+    const urlParams = new URLSearchParams(window.location.search);
+    const valorBusqueda = urlParams.get("busqueda") || document.getElementById("busqueda-input")?.value || "";
+    if (document.getElementById("busqueda-input")) {
+      document.getElementById("busqueda-input").value = valorBusqueda;
+    }
+    filtrarProductos(valorBusqueda);
+  })
+  .catch(err => {
+    contenedor.innerHTML = `<p class="col-span-full text-center text-red-600">Error al cargar productos de ${fuente}</p>`;
+  });
 
-      .catch(err => {
-        contenedor.innerHTML = `<p class="col-span-full text-center text-red-600">Error al cargar productos de ${fuente}</p>`;
-      });
   }
 
   function filtrarProductos(termino) {
