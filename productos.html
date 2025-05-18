@@ -69,8 +69,13 @@
       .then(res => res.json())
       .then(productos => {
         productosCargados = productos;
-        filtrarProductos(document.getElementById("busqueda-input")?.value || "");
-      })
+        const urlParams = new URLSearchParams(window.location.search);
+const valorBusqueda = urlParams.get("busqueda") || document.getElementById("busqueda-input")?.value || "";
+if (document.getElementById("busqueda-input")) {
+  document.getElementById("busqueda-input").value = valorBusqueda;
+}
+filtrarProductos(valorBusqueda);
+
       .catch(err => {
         contenedor.innerHTML = `<p class="col-span-full text-center text-red-600">Error al cargar productos de ${fuente}</p>`;
       });
