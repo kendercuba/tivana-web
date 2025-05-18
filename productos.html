@@ -24,78 +24,105 @@
     <div id="contenedor-productos" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
   </div>
 
-  <script>
-    // Cargar el header
-    fetch("components/header.html")
-      .then(res => res.text())
-      .then(html => document.getElementById("header-placeholder").innerHTML = html);
+<script>
+  let productosCargados = [];
+  let fuenteActual = "shein";
 
-    // Referencia a botones
-    const botones = document.querySelectorAll(".tab-btn");
-    const contenedor = document.getElementById("contenedor-productos");
-
-    // Rutas por fuente
-    const rutas = {
-      shein: "data/shein/productos_shein.json",
-      amazon: "data/amazon/productos_amazon.json",
-      temu: "data/temu/productos_temus.json",
-      aliexpress: "data/aliexpress/productos_aliexpress.json"
-    };
-
-    // Función que carga productos de la fuente seleccionada
-    function cargarProductos(fuente) {
-  const idioma = localStorage.getItem("idioma") || "es";
-
-  botones.forEach(b => {
-    b.classList.remove("bg-orange-500", "text-white");
-    b.classList.add("bg-gray-300", "text-black");
-  });
-  document.querySelector(`.tab-btn[data-fuente="${fuente}"]`).classList.add("bg-orange-500", "text-white");
-
-  contenedor.innerHTML = `<p class="col-span-full text-center text-gray-500">Cargando productos de ${fuente}...</p>`;
-
-  fetch(rutas[fuente])
-    .then(res => res.json())
-    .then(productos => {
-      contenedor.innerHTML = "";
-
-      productos.forEach(producto => {
-        const titulo = producto.title?.[idioma] || producto.title?.en || "Sin título";
-        const descripcion = producto.description?.[idioma] || producto.description?.en || "";
-        const imagen = producto.main_image || producto.images?.[0] || "";
-        const precio = producto.sale_price?.usd_amount || producto.retail_price?.usd_amount || "N/A";
-        const id = producto.id || producto.product_id;
-
-        const card = document.createElement("div");
-        card.className = "bg-white rounded shadow p-4 flex flex-col hover:shadow-lg transition";
-
-        card.innerHTML = `
-          <img src="${imagen}" alt="${titulo}" class="w-full h-48 object-contain mb-3 rounded" />
-          <h2 class="text-base font-semibold mb-1 truncate">${titulo}</h2>
-          <p class="text-green-600 font-bold mb-2">$${precio}</p>
-          <a href="producto.html?id=${id}" class="mt-auto bg-orange-500 text-white text-sm px-4 py-2 rounded hover:bg-orange-600 text-center">
-            Ver detalle
-          </a>
-        `;
-
-        contenedor.appendChild(card);
-      });
+  // Cargar el header y activar búsqueda después
+  fetch("components/header.html")
+    .then(res => res.text())
+    .then(html => {
+      document.getElementById("header-placeholder").innerHTML = html;
     })
-    .catch(err => {
-      contenedor.innerHTML = `<p class="col-span-full text-center text-red-600">Error al cargar productos de ${fuente}</p>`;
+    .then(() => {
+      const input = document.getElementById("busqueda-input");
+      if (input) {
+        input.addEventListener("input", e => {
+          filtrarProductos(e.target.value);
+        });
+      }
     });
-}
-   // Activar pestaña inicial
-    cargarProductos("shein");
 
-    // Activar pestañas al hacer clic
-    botones.forEach(btn => {
-      btn.addEventListener("click", () => {
-        const fuente = btn.getAttribute("data-fuente");
-        cargarProductos(fuente);
-      });
+  const botones = document.querySelectorAll(".tab-btn");
+  const contenedor = document.getElementById("contenedor-productos");
+
+  const rutas = {
+    shein: "data/shein/productos_shein.json",
+    amazon: "data/amazon/productos_amazon.json",
+    temu: "data/temu/productos_temus.json",
+    aliexpress: "data/aliexpress/productos_aliexpress.json"
+  };
+
+  function cargarProductos(fuente) {
+    fuenteActual = fuente;
+    const idioma = localStorage.getItem("idioma") || "es";
+
+    botones.forEach(b => {
+      b.classList.remove("bg-orange-500", "text-white");
+      b.classList.add("bg-gray-300", "text-black");
     });
-  </script>
+    document.querySelector(`.tab-btn[data-fuente="${fuente}"]`).classList.add("bg-orange-500", "text-white");
+
+    contenedor.innerHTML = `<p class="col-span-full text-center text-gray-500">Cargando productos de ${fuente}...</p>`;
+
+    fetch(rutas[fuente])
+      .then(res => res.json())
+      .then(productos => {
+        productosCargados = productos;
+        filtrarProductos(document.getElementById("busqueda-input")?.value || "");
+      })
+      .catch(err => {
+        contenedor.innerHTML = `<p class="col-span-full text-center text-red-600">Error al cargar productos de ${fuente}</p>`;
+      });
+  }
+
+  function filtrarProductos(termino) {
+    const idioma = localStorage.getItem("idioma") || "es";
+    const resultados = productosCargados.filter(producto => {
+      const titulo = producto.title?.[idioma]?.toLowerCase() || producto.title?.en?.toLowerCase() || "";
+      return titulo.includes(termino.toLowerCase());
+    });
+
+    mostrarProductos(resultados, idioma);
+  }
+
+  function mostrarProductos(productos, idioma) {
+    contenedor.innerHTML = "";
+
+    productos.forEach(producto => {
+      const titulo = producto.title?.[idioma] || producto.title?.en || "Sin título";
+      const descripcion = producto.description?.[idioma] || producto.description?.en || "";
+      const imagen = producto.main_image || producto.images?.[0] || "";
+      const precio = producto.sale_price?.usd_amount || producto.retail_price?.usd_amount || "N/A";
+      const id = producto.id || producto.product_id;
+
+      const card = document.createElement("div");
+      card.className = "bg-white rounded shadow p-4 flex flex-col hover:shadow-lg transition";
+
+      card.innerHTML = `
+        <img src="${imagen}" alt="${titulo}" class="w-full h-48 object-contain mb-3 rounded" />
+        <h2 class="text-base font-semibold mb-1 truncate">${titulo}</h2>
+        <p class="text-green-600 font-bold mb-2">$${precio}</p>
+        <a href="producto.html?id=${id}" class="mt-auto bg-orange-500 text-white text-sm px-4 py-2 rounded hover:bg-orange-600 text-center">
+          Ver detalle
+        </a>
+      `;
+
+      contenedor.appendChild(card);
+    });
+  }
+
+  // Activar pestaña inicial
+  cargarProductos("shein");
+
+  // Activar pestañas
+  botones.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const fuente = btn.getAttribute("data-fuente");
+      cargarProductos(fuente);
+    });
+  });
+</script>
 
 </body>
 </html>
