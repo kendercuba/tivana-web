@@ -7,6 +7,9 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100">
+    <div id="header-placeholder"></div>
+
+
   <div class="max-w-6xl mx-auto p-4">
     <a href="index.html" class="text-blue-600 underline">Volver al inicio</a>
     <div id="producto-container" class="mt-6 bg-white rounded shadow p-6 flex flex-col md:flex-row gap-6">
@@ -30,6 +33,14 @@
       </div>
     </div>
   </div>
+
+<script>
+  fetch("components/header.html")
+    .then(res => res.text())
+    .then(html => {
+      document.getElementById("header-placeholder").innerHTML = html;
+    });
+</script>
 
   <script>
   const urlParams = new URLSearchParams(window.location.search);
