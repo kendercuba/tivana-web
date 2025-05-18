@@ -76,7 +76,7 @@
 
   <!-- JS Preview y Carrusel -->
   <script>
-    fetch("productos_tivana.json")
+    fetch("/data/shein/produtos_shein.json")
       .then(res => res.json())
       .then(productos => {
         const masVendidos = productos.slice(0, 4);
