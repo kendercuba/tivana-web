@@ -32,30 +32,87 @@
   </div>
 
   <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const id = urlParams.get("id");
+  const urlParams = new URLSearchParams(window.location.search);
+  const id = urlParams.get("id");
 
-    fetch("productos_tivana_detalle.json")
-      .then(res => res.json())
-      .then(productos => {
-        const producto = productos.find(p => p.id == id);
-        if (!producto) return document.body.innerHTML = "<p class='text-center text-red-600'>Producto no encontrado</p>";
+  fetch("productos_tivana_detalle.json")
+    .then(res => res.json())
+    .then(productos => {
+      const producto = productos.find(p => p.id == id || p.product_id == id);
+      if (!producto) return document.body.innerHTML = "<p class='text-center text-red-600'>Producto no encontrado</p>";
 
-        document.getElementById("titulo").textContent = producto.titulo;
-        document.getElementById("precio").textContent = `$${producto.precio}`;
-        document.getElementById("descripcion").textContent = producto.descripcion || "Sin descripción.";
-        document.getElementById("imagen-principal").src = producto.imagenes?.[0] || "";
-        document.getElementById("comprar-enlace").href = producto.enlace;
+      // Título
+      document.getElementById("titulo").textContent = producto.title || "Sin título";
 
-        const galeria = document.getElementById("galeria");
-        producto.imagenes?.forEach(img => {
-          const mini = document.createElement("img");
-          mini.src = img;
-          mini.className = "w-20 h-20 object-cover cursor-pointer rounded hover:ring-2";
-          mini.onclick = () => document.getElementById("imagen-principal").src = img;
-          galeria.appendChild(mini);
-        });
+      // Precio
+      const precio = producto.sale_price?.usd_amount || producto.retail_price?.usd_amount || "N/A";
+      document.getElementById("precio").textContent = `$${precio}`;
+
+      // Descripción
+      document.getElementById("descripcion").textContent = producto.description || "Sin descripción.";
+
+      // Imagen principal
+      const primeraImagen = producto.images?.[0] || producto.main_image || "";
+      document.getElementById("imagen-principal").src = primeraImagen;
+
+      // Enlace de compra
+      document.getElementById("comprar-enlace").href = producto.url || "#";
+
+      // Galería de imágenes
+      const galeria = document.getElementById("galeria");
+      galeria.innerHTML = "";
+      producto.images?.forEach(img => {
+        const mini = document.createElement("img");
+        mini.src = img;
+        mini.className = "w-20 h-20 object-cover cursor-pointer rounded hover:ring-2";
+        mini.onclick = () => document.getElementById("imagen-principal").src = img;
+        galeria.appendChild(mini);
       });
-  </script>
+
+      // Añadir sección de tallas disponibles
+      if (producto.sizes?.length > 0 || producto.second_sale_attrs?.length > 0) {
+        const tallas = producto.sizes || producto.second_sale_attrs[0]?.values || [];
+        const seccionTallas = document.createElement("div");
+        seccionTallas.className = "mt-4";
+        seccionTallas.innerHTML = `<h2 class="font-semibold mb-2">Tallas disponibles:</h2><div class="flex flex-wrap gap-2">`;
+
+        tallas.forEach(t => {
+          const talla = typeof t === "string" ? t : t.value || t.attr_value_name;
+          const tag = document.createElement("span");
+          tag.textContent = talla;
+          tag.className = "bg-gray-200 px-2 py-1 rounded text-sm";
+          seccionTallas.appendChild(tag);
+        });
+
+        document.querySelector("#producto-container .md\\:w-1\\/2").appendChild(seccionTallas);
+      }
+
+      // Añadir color
+      if (producto.main_sale_attr?.value || producto.color) {
+        const color = producto.main_sale_attr?.value || producto.color;
+        const colorTag = document.createElement("p");
+        colorTag.className = "mt-2 text-sm text-gray-600";
+        colorTag.innerHTML = `<strong>Color:</strong> ${color}`;
+        document.querySelector("#producto-container .md\\:w-1\\/2").appendChild(colorTag);
+      }
+
+      // Añadir especificaciones técnicas
+      if (producto.specs?.length > 0) {
+        const specsContainer = document.createElement("div");
+        specsContainer.className = "mt-6";
+        specsContainer.innerHTML = `<h2 class="font-semibold mb-2">Detalles del producto:</h2><ul class="list-disc list-inside text-sm text-gray-700 space-y-1"></ul>`;
+        const ul = specsContainer.querySelector("ul");
+
+        producto.specs.forEach(spec => {
+          const li = document.createElement("li");
+          li.textContent = `${spec.name}: ${spec.value}`;
+          ul.appendChild(li);
+        });
+
+        document.querySelector("#producto-container .md\\:w-1\\/2").appendChild(specsContainer);
+      }
+    });
+</script>
+
 </body>
 </html>
