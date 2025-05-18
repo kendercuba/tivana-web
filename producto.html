@@ -42,87 +42,88 @@
     });
 </script>
 
-  <script>
-  const urlParams = new URLSearchParams(window.location.search);
-  const id = urlParams.get("id");
+<script>
+ fetch("data/shein/productos_shein.json")
+  .then(res => res.json())
+  .then(productos => {
+    const id = new URLSearchParams(window.location.search).get("id");
+    const producto = productos.find(p => p.id == id || p.product_id == id);
+    if (!producto) return document.body.innerHTML = "<p class='text-center text-red-600'>Producto no encontrado</p>";
 
-  fetch("data/shein/productos_shein.json")
-    .then(res => res.json())
-    .then(productos => {
-      const producto = productos.find(p => p.id == id || p.product_id == id);
-      if (!producto) return document.body.innerHTML = "<p class='text-center text-red-600'>Producto no encontrado</p>";
+    const idioma = localStorage.getItem("idioma") || "es";
+    const titulo = producto.title?.[idioma] || producto.title?.en || "Sin título";
+    const descripcion = producto.description?.[idioma] || producto.description?.en || "Sin descripción.";
 
-      // Título
-      document.getElementById("titulo").textContent = producto.title || "Sin título";
+    // Mostrar título y descripción
+    document.getElementById("titulo").textContent = titulo;
+    document.getElementById("descripcion").textContent = descripcion;
 
-      // Precio
-      const precio = producto.sale_price?.usd_amount || producto.retail_price?.usd_amount || "N/A";
-      document.getElementById("precio").textContent = `$${precio}`;
+    // Precio
+    const precio = producto.sale_price?.usd_amount || producto.retail_price?.usd_amount || "N/A";
+    document.getElementById("precio").textContent = `$${precio}`;
 
-      // Descripción
-      document.getElementById("descripcion").textContent = producto.description || "Sin descripción.";
+    // Imagen principal
+    const primeraImagen = producto.images?.[0] || producto.main_image || "";
+    document.getElementById("imagen-principal").src = primeraImagen;
 
-      // Imagen principal
-      const primeraImagen = producto.images?.[0] || producto.main_image || "";
-      document.getElementById("imagen-principal").src = primeraImagen;
+    // Enlace de compra
+    document.getElementById("comprar-enlace").href = producto.url || "#";
 
-      // Enlace de compra
-      document.getElementById("comprar-enlace").href = producto.url || "#";
+    // Galería de imágenes
+    const galeria = document.getElementById("galeria");
+    galeria.innerHTML = "";
+    producto.images?.forEach(img => {
+      const mini = document.createElement("img");
+      mini.src = img;
+      mini.className = "w-20 h-20 object-cover cursor-pointer rounded hover:ring-2";
+      mini.onclick = () => document.getElementById("imagen-principal").src = img;
+      galeria.appendChild(mini);
+    });
 
-      // Galería de imágenes
-      const galeria = document.getElementById("galeria");
-      galeria.innerHTML = "";
-      producto.images?.forEach(img => {
-        const mini = document.createElement("img");
-        mini.src = img;
-        mini.className = "w-20 h-20 object-cover cursor-pointer rounded hover:ring-2";
-        mini.onclick = () => document.getElementById("imagen-principal").src = img;
-        galeria.appendChild(mini);
+    // Tallas disponibles
+    if (producto.sizes?.length > 0 || producto.second_sale_attrs?.length > 0) {
+      const tallas = producto.sizes || producto.second_sale_attrs[0]?.values || [];
+      const seccionTallas = document.createElement("div");
+      seccionTallas.className = "mt-4";
+      seccionTallas.innerHTML = `<h2 class="font-semibold mb-2">Tallas disponibles:</h2><div class="flex flex-wrap gap-2">`;
+
+      tallas.forEach(t => {
+        const talla = typeof t === "string" ? t : t.value || t.attr_value_name;
+        const tag = document.createElement("span");
+        tag.textContent = talla;
+        tag.className = "bg-gray-200 px-2 py-1 rounded text-sm";
+        seccionTallas.appendChild(tag);
       });
 
-      // Añadir sección de tallas disponibles
-      if (producto.sizes?.length > 0 || producto.second_sale_attrs?.length > 0) {
-        const tallas = producto.sizes || producto.second_sale_attrs[0]?.values || [];
-        const seccionTallas = document.createElement("div");
-        seccionTallas.className = "mt-4";
-        seccionTallas.innerHTML = `<h2 class="font-semibold mb-2">Tallas disponibles:</h2><div class="flex flex-wrap gap-2">`;
+      document.querySelector("#producto-container .md\\:w-1\\/2").appendChild(seccionTallas);
+    }
 
-        tallas.forEach(t => {
-          const talla = typeof t === "string" ? t : t.value || t.attr_value_name;
-          const tag = document.createElement("span");
-          tag.textContent = talla;
-          tag.className = "bg-gray-200 px-2 py-1 rounded text-sm";
-          seccionTallas.appendChild(tag);
-        });
+    // Color
+    if (producto.main_sale_attr?.value || producto.color) {
+      const color = producto.main_sale_attr?.value || producto.color;
+      const colorTag = document.createElement("p");
+      colorTag.className = "mt-2 text-sm text-gray-600";
+      colorTag.innerHTML = `<strong>Color:</strong> ${color}`;
+      document.querySelector("#producto-container .md\\:w-1\\/2").appendChild(colorTag);
+    }
 
-        document.querySelector("#producto-container .md\\:w-1\\/2").appendChild(seccionTallas);
-      }
+    // Especificaciones técnicas
+    if (producto.specs?.length > 0) {
+      const specsContainer = document.createElement("div");
+      specsContainer.className = "mt-6";
+      specsContainer.innerHTML = `<h2 class="font-semibold mb-2">Detalles del producto:</h2><ul class="list-disc list-inside text-sm text-gray-700 space-y-1"></ul>`;
+      const ul = specsContainer.querySelector("ul");
 
-      // Añadir color
-      if (producto.main_sale_attr?.value || producto.color) {
-        const color = producto.main_sale_attr?.value || producto.color;
-        const colorTag = document.createElement("p");
-        colorTag.className = "mt-2 text-sm text-gray-600";
-        colorTag.innerHTML = `<strong>Color:</strong> ${color}`;
-        document.querySelector("#producto-container .md\\:w-1\\/2").appendChild(colorTag);
-      }
+      producto.specs.forEach(spec => {
+        const li = document.createElement("li");
+        li.textContent = `${spec.name}: ${spec.value}`;
+        ul.appendChild(li);
+      });
 
-      // Añadir especificaciones técnicas
-      if (producto.specs?.length > 0) {
-        const specsContainer = document.createElement("div");
-        specsContainer.className = "mt-6";
-        specsContainer.innerHTML = `<h2 class="font-semibold mb-2">Detalles del producto:</h2><ul class="list-disc list-inside text-sm text-gray-700 space-y-1"></ul>`;
-        const ul = specsContainer.querySelector("ul");
+      document.querySelector("#producto-container .md\\:w-1\\/2").appendChild(specsContainer);
+    }
+  });
 
-        producto.specs.forEach(spec => {
-          const li = document.createElement("li");
-          li.textContent = `${spec.name}: ${spec.value}`;
-          ul.appendChild(li);
-        });
-
-        document.querySelector("#producto-container .md\\:w-1\\/2").appendChild(specsContainer);
-      }
-    });
 </script>
 
 </body>
