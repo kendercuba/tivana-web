@@ -44,50 +44,48 @@
 
     // Función que carga productos de la fuente seleccionada
     function cargarProductos(fuente) {
-      // Estilos visuales pestañas
-      botones.forEach(b => {
-        b.classList.remove("bg-orange-500", "text-white");
-        b.classList.add("bg-gray-300", "text-black");
+  const idioma = localStorage.getItem("idioma") || "es";
+
+  botones.forEach(b => {
+    b.classList.remove("bg-orange-500", "text-white");
+    b.classList.add("bg-gray-300", "text-black");
+  });
+  document.querySelector(`.tab-btn[data-fuente="${fuente}"]`).classList.add("bg-orange-500", "text-white");
+
+  contenedor.innerHTML = `<p class="col-span-full text-center text-gray-500">Cargando productos de ${fuente}...</p>`;
+
+  fetch(rutas[fuente])
+    .then(res => res.json())
+    .then(productos => {
+      contenedor.innerHTML = "";
+
+      productos.forEach(producto => {
+        const titulo = producto.title?.[idioma] || producto.title?.en || "Sin título";
+        const descripcion = producto.description?.[idioma] || producto.description?.en || "";
+        const imagen = producto.main_image || producto.images?.[0] || "";
+        const precio = producto.sale_price?.usd_amount || producto.retail_price?.usd_amount || "N/A";
+        const id = producto.id || producto.product_id;
+
+        const card = document.createElement("div");
+        card.className = "bg-white rounded shadow p-4 flex flex-col hover:shadow-lg transition";
+
+        card.innerHTML = `
+          <img src="${imagen}" alt="${titulo}" class="w-full h-48 object-contain mb-3 rounded" />
+          <h2 class="text-base font-semibold mb-1 truncate">${titulo}</h2>
+          <p class="text-green-600 font-bold mb-2">$${precio}</p>
+          <a href="producto.html?id=${id}" class="mt-auto bg-orange-500 text-white text-sm px-4 py-2 rounded hover:bg-orange-600 text-center">
+            Ver detalle
+          </a>
+        `;
+
+        contenedor.appendChild(card);
       });
-      document.querySelector(`.tab-btn[data-fuente="${fuente}"]`).classList.add("bg-orange-500", "text-white");
-
-      // Limpiar productos
-      contenedor.innerHTML = "<p class='col-span-full text-center'>Cargando productos...</p>";
-
-      // Cargar archivo según fuente
-      fetch(rutas[fuente])
-        .then(res => res.json())
-        .then(productos => {
-          contenedor.innerHTML = "";
-
-          productos.forEach(producto => {
-            const card = document.createElement("div");
-            card.className = "bg-white rounded shadow p-4 flex flex-col hover:shadow-lg transition";
-
-            const imagen = producto.main_image || producto.images?.[0] || "";
-            const titulo = producto.title || "Sin título";
-            const precio = producto.sale_price?.usd_amount || producto.retail_price?.usd_amount || "N/A";
-
-            const id = producto.id || producto.product_id;
-
-            card.innerHTML = `
-              <img src="${imagen}" alt="${titulo}" class="w-full h-48 object-contain mb-3 rounded" />
-              <h2 class="text-base font-semibold mb-1 truncate">${titulo}</h2>
-              <p class="text-green-600 font-bold mb-2">$${precio}</p>
-              <a href="producto.html?id=${id}" class="mt-auto bg-orange-500 text-white text-sm px-4 py-2 rounded hover:bg-orange-600 text-center">
-                Ver detalle
-              </a>
-            `;
-
-            contenedor.appendChild(card);
-          });
-        })
-        .catch(err => {
-          contenedor.innerHTML = `<p class="col-span-full text-center text-red-600">Error al cargar productos de ${fuente}</p>`;
-        });
-    }
-
-    // Activar pestaña inicial
+    })
+    .catch(err => {
+      contenedor.innerHTML = `<p class="col-span-full text-center text-red-600">Error al cargar productos de ${fuente}</p>`;
+    });
+}
+   // Activar pestaña inicial
     cargarProductos("shein");
 
     // Activar pestañas al hacer clic
