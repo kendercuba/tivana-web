@@ -1,118 +1,103 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Productos | Tivana</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100">
 
-  <!-- CABECERA -->
+  <!-- Header reutilizable -->
   <div id="header-placeholder"></div>
+
+  <!-- Pestañas -->
+  <div class="max-w-7xl mx-auto p-4">
+    <div class="flex gap-4 mb-4">
+      <button class="tab-btn bg-orange-500 text-white px-4 py-2 rounded" data-fuente="shein">Shein</button>
+      <button class="tab-btn bg-gray-300 text-black px-4 py-2 rounded" data-fuente="amazon">Amazon</button>
+      <button class="tab-btn bg-gray-300 text-black px-4 py-2 rounded" data-fuente="temu">Temu</button>
+      <button class="tab-btn bg-gray-300 text-black px-4 py-2 rounded" data-fuente="aliexpress">AliExpress</button>
+    </div>
+
+    <!-- Contenedor de productos -->
+    <div id="contenedor-productos" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+  </div>
+
   <script>
+    // Cargar el header
     fetch("components/header.html")
       .then(res => res.text())
-      .then(data => document.getElementById("header-placeholder").innerHTML = data);
-  </script>
+      .then(html => document.getElementById("header-placeholder").innerHTML = html);
 
-  <main class="max-w-[1600px] mx-auto px-4 py-6 flex gap-6">
+    // Referencia a botones
+    const botones = document.querySelectorAll(".tab-btn");
+    const contenedor = document.getElementById("contenedor-productos");
 
-    <!-- FILTROS -->
-    <aside class="w-[220px] hidden lg:block bg-white p-4 rounded shadow">
-      <h2 class="font-semibold text-lg mb-3">Filtrar por</h2>
+    // Rutas por fuente
+    const rutas = {
+      shein: "productos_tivana_detalle.json",
+      amazon: "data/amazon/productos_amazon.json",
+      temu: "data/temu/productos_temus.json",
+      aliexpress: "data/aliexpress/productos_aliexpress.json"
+    };
 
-      <div class="mb-4">
-        <h3 class="text-sm font-bold mb-2">Precio</h3>
-        <label class="block text-sm"><input type="checkbox" value="menos25" class="filtro-precio mr-2"> Menos de $25</label>
-        <label class="block text-sm"><input type="checkbox" value="entre25y50" class="filtro-precio mr-2"> $25 - $50</label>
-        <label class="block text-sm"><input type="checkbox" value="entre50y100" class="filtro-precio mr-2"> $50 - $100</label>
-        <label class="block text-sm"><input type="checkbox" value="mas100" class="filtro-precio mr-2"> Más de $100</label>
-      </div>
-
-      <div class="mb-4">
-        <h3 class="text-sm font-bold mb-2">Categoría</h3>
-        <label class="block text-sm"><input type="checkbox" value="cocina" class="filtro-categoria mr-2"> Cocina</label>
-        <label class="block text-sm"><input type="checkbox" value="tecnologia" class="filtro-categoria mr-2"> Tecnología</label>
-        <label class="block text-sm"><input type="checkbox" value="ropa" class="filtro-categoria mr-2"> Ropa</label>
-      </div>
-    </aside>
-
-    <!-- PRODUCTOS -->
-    <section class="flex-1">
-      <h2 class="text-2xl font-bold mb-4">Resultados</h2>
-      <div id="productos-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4"></div>
-    </section>
-  </main>
-
-  <script>
-    let productosOriginales = [];
-
-    function cargarProductos(filtrados) {
-      const contenedor = document.getElementById("productos-container");
-      contenedor.innerHTML = "";
-
-      if (filtrados.length === 0) {
-        contenedor.innerHTML = `<p class="text-red-600">No se encontraron productos.</p>`;
-        return;
-      }
-
-      filtrados.forEach(p => {
-        const total = (p.precio + p.envio).toFixed(2);
-        const tarjeta = `
-          <div class="bg-white rounded shadow p-3 flex flex-col justify-between hover:shadow-lg transition">
-            <img src="${p.imagen}" alt="${p.titulo}" class="w-full h-40 object-contain mb-3" />
-            <h3 class="text-sm font-medium mb-1">${p.titulo}</h3>
-            <p class="text-gray-600 text-sm mb-1">Precio: $${p.precio}</p>
-            <p class="text-gray-600 text-sm mb-1">Envío: $${p.envio}</p>
-            <p class="text-green-700 font-semibold text-sm mb-2">Total: $${total}</p>
-            <button class="bg-blue-600 text-white text-xs px-3 py-1 rounded hover:bg-blue-700 transition">
-              Agregar al carrito
-            </button>
-          </div>
-        `;
-        contenedor.innerHTML += tarjeta;
+    // Función que carga productos de la fuente seleccionada
+    function cargarProductos(fuente) {
+      // Estilos visuales pestañas
+      botones.forEach(b => {
+        b.classList.remove("bg-orange-500", "text-white");
+        b.classList.add("bg-gray-300", "text-black");
       });
-    }
+      document.querySelector(`.tab-btn[data-fuente="${fuente}"]`).classList.add("bg-orange-500", "text-white");
 
-    function aplicarFiltros() {
-      const seleccionPrecio = Array.from(document.querySelectorAll(".filtro-precio:checked")).map(e => e.value);
-      const seleccionCategoria = Array.from(document.querySelectorAll(".filtro-categoria:checked")).map(e => e.value);
+      // Limpiar productos
+      contenedor.innerHTML = "<p class='col-span-full text-center'>Cargando productos...</p>";
 
-      let filtrados = productosOriginales;
+      // Cargar archivo según fuente
+      fetch(rutas[fuente])
+        .then(res => res.json())
+        .then(productos => {
+          contenedor.innerHTML = "";
 
-      if (seleccionPrecio.length) {
-        filtrados = filtrados.filter(p => {
-          if (seleccionPrecio.includes("menos25") && p.precio < 25) return true;
-          if (seleccionPrecio.includes("entre25y50") && p.precio >= 25 && p.precio < 50) return true;
-          if (seleccionPrecio.includes("entre50y100") && p.precio >= 50 && p.precio < 100) return true;
-          if (seleccionPrecio.includes("mas100") && p.precio >= 100) return true;
-          return false;
+          productos.forEach(producto => {
+            const card = document.createElement("div");
+            card.className = "bg-white rounded shadow p-4 flex flex-col hover:shadow-lg transition";
+
+            const imagen = producto.main_image || producto.images?.[0] || "";
+            const titulo = producto.title || "Sin título";
+            const precio = producto.sale_price?.usd_amount || producto.retail_price?.usd_amount || "N/A";
+
+            const id = producto.id || producto.product_id;
+
+            card.innerHTML = `
+              <img src="${imagen}" alt="${titulo}" class="w-full h-48 object-contain mb-3 rounded" />
+              <h2 class="text-base font-semibold mb-1 truncate">${titulo}</h2>
+              <p class="text-green-600 font-bold mb-2">$${precio}</p>
+              <a href="producto.html?id=${id}" class="mt-auto bg-orange-500 text-white text-sm px-4 py-2 rounded hover:bg-orange-600 text-center">
+                Ver detalle
+              </a>
+            `;
+
+            contenedor.appendChild(card);
+          });
+        })
+        .catch(err => {
+          contenedor.innerHTML = `<p class="col-span-full text-center text-red-600">Error al cargar productos de ${fuente}</p>`;
         });
-      }
-
-      if (seleccionCategoria.length) {
-        filtrados = filtrados.filter(p =>
-          seleccionCategoria.includes(p.categoria?.toLowerCase())
-        );
-      }
-
-      cargarProductos(filtrados);
     }
 
-    fetch("productos_tivana.json")
-      .then(res => res.json())
-      .then(data => {
-        productosOriginales = data;
-        cargarProductos(productosOriginales);
-      });
+    // Activar pestaña inicial
+    cargarProductos("shein");
 
-    document.addEventListener("change", function (e) {
-      if (e.target.matches(".filtro-precio, .filtro-categoria")) {
-        aplicarFiltros();
-      }
+    // Activar pestañas al hacer clic
+    botones.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const fuente = btn.getAttribute("data-fuente");
+        cargarProductos(fuente);
+      });
     });
   </script>
+
 </body>
 </html>
