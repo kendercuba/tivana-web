@@ -46,7 +46,7 @@
   const urlParams = new URLSearchParams(window.location.search);
   const id = urlParams.get("id");
 
-  fetch("productos_tivana_detalle.json")
+  fetch("data/shein/produtos_shein.json")
     .then(res => res.json())
     .then(productos => {
       const producto = productos.find(p => p.id == id || p.product_id == id);
