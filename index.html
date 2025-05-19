@@ -12,11 +12,11 @@
   <!-- CABECERA -->
   <div id="header-container"></div>
   <script>
- fetch('components/header.html')
+fetch('components/header.html')
   .then(res => res.text())
   .then(html => {
     document.getElementById('header-container').innerHTML = html;
-    activarNavegacion(); // ✅ MUY IMPORTANTE para que los <a data-vista="..."> funcionen
+    activarNavegacion(); // ✅ MUY IMPORTANTE para que los enlaces del header funcionen como SPA
   });
 
   </script>
@@ -144,6 +144,16 @@
       }
     });
 
+    function activarNavegacion() {
+  document.querySelectorAll("[data-vista]").forEach(el => {
+    el.addEventListener("click", e => {
+      e.preventDefault();
+      const vista = el.getAttribute("data-vista");
+      const param = el.getAttribute("data-param") || "";
+      cargarVista(vista, param);
+    });
+  });
+}
     // SPA dinámico
     function cargarVista(vista, param = "") {
       const ruta = `/views/${vista}.html${param ? "?" + param : ""}`;
@@ -154,16 +164,8 @@
           window.scrollTo(0, 0);
         });
     }
-
-    document.addEventListener("click", function (e) {
-      const target = e.target.closest("[data-vista]");
-      if (target) {
-        e.preventDefault();
-        const vista = target.getAttribute("data-vista");
-        const param = target.getAttribute("data-param") || "";
-        cargarVista(vista, param);
-      }
-    });
+    cargarVista("home");
+    
   </script>
 
 </body>
